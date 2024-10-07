@@ -1,0 +1,40 @@
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.metrics import mean_absolute_error
+import matplotlib.pyplot as plt
+
+# Крок 1: Генерація випадкових даних
+np.random.seed(42)
+X = np.random.rand(1000, 1) * 100  # 1000 випадкових значень у діапазоні від 0 до 100
+y = 3 * X.squeeze() + np.random.randn(1000) * 10  # Лінійна залежність з шумом
+
+# Крок 2: Нормалізація даних
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Крок 3: Розподіл на навчальну і тестову вибірки
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+# Крок 4 і 5: Навчання KNN-регресора з різними значеннями K та пошук найкращого K
+k_values = range(1, 21)
+mae_values = []
+
+for k in k_values:
+    knn = KNeighborsRegressor(n_neighbors=k)
+    knn.fit(X_train, y_train)
+    y_pred = knn.predict(X_test)
+    mae = mean_absolute_error(y_test, y_pred)
+    mae_values.append(mae)
+
+# Крок 6: Візуалізація результатів
+plt.plot(k_values, mae_values, marker='o')
+plt.xlabel('K')
+plt.ylabel('MAE (Mean Absolute Error)')
+plt.title('Вибір оптимального K')
+plt.show()
+
+# Вибір найкращого K
+best_k = k_values[np.argmin(mae_values)]
+print(f"Найкраще значення K: {best_k
